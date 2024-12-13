@@ -62,7 +62,8 @@ app.use("/api/users", userRoute);
 app.use("/admin", adminRoute);
 const getToken = async () => {
   // app.locals.spotifyToken = 'BQCaNQqHbgDBW00BZd-IO_pUAwQMoG73HVMBQokEt86sPUmZLa0_CaqRN4cbl2BG6uj3AUzx8wo8rdKBVYOZYYI0o-KGHBnWUY3OzEVQoxOeztumB_g'
-  let tokenData = await fetch("http://localhost:3000/admin/refreshtoken");
+   const baseUrl = process.env.API_URL || "http://localhost:3000"
+  let tokenData = await fetch(`${baseUrl}/admin/refreshtoken`);
   console.log("tokenData");
   console.log(tokenData);
   let token = await tokenData.json();
@@ -77,7 +78,8 @@ const getToken = async () => {
 };
 
 const updateCount = async () => {
-  let countData = await fetch("http://localhost:3000/admin/count");
+  const baseUrl = process.env.API_URL || "http://localhost:3000"
+  let countData = await fetch(`${baseUrl}/admin/count`);
   let count = await countData.json();
   if (count.success) {
     console.log(count.data);
