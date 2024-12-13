@@ -8,6 +8,9 @@ import { errorHandler, notFound } from "./src/middleware/errMiddleware.js";
 import session from "express-session";
 import passport from "passport";
 import fetch from "node-fetch";
+import cors from "cors";
+
+
 
 // Routes
 import languageRoute from "./src/routes/languageRoute.js";
@@ -20,6 +23,7 @@ connectDB();
 
 const PORT = process.env.PORT || 3000;
 const app = express();
+
 app.set("views", "./src/views");
 app.set("view engine", "ejs");
 app.use(express.static(process.cwd() + "/public"));
@@ -34,6 +38,7 @@ app.use(
     saveUninitialized: false, // don't create session until something stored
   })
 );
+app.use(cors()); // Enable CORS for all requests
 
 app.use(passport.initialize());
 app.use(passport.authenticate("session"));
@@ -55,9 +60,48 @@ app.use("/api/languages", languageRoute);
 app.use("/api/categories", categoryRoute);
 app.use("/api/users", userRoute);
 app.use("/admin", adminRoute);
+// const getToken = async () => {
+//   // app.locals.spotifyToken = 'BQCaNQqHbgDBW00BZd-IO_pUAwQMoG73HVMBQokEt86sPUmZLa0_CaqRN4cbl2BG6uj3AUzx8wo8rdKBVYOZYYI0o-KGHBnWUY3OzEVQoxOeztumB_g'
+//   let tokenData = await fetch("http://localhost:3000/admin/refreshtoken");
+//   console.log("tokenData");
+//   console.log(tokenData);
+//   let token = await tokenData.json();
+//   if (token.success) {
+//     app.locals.spotifyToken = token.token.access_token;
+//     updateCount();
+//   } else {
+//     setTimeout(() => {
+//       getToken();
+//     }, 5000);
+//   }
+// };
+
+// const updateCount = async () => {
+//   let countData = await fetch("http://localhost:3000/admin/count");
+//   let count = await countData.json();
+//   if (count.success) {
+//     console.log(count.data);
+//   } else {
+//     setTimeout(() => {
+//       updateCount();
+//     }, 5000);
+//   }
+// };
+
+// getToken();
+
+// setInterval(() => {
+//   getToken();
+// }, 3500000);
+
+// setInterval(() => {
+//   // updateCount();
+// }, 604800000);
+
+
 const getToken = async () => {
-  // app.locals.spotifyToken = 'BQCaNQqHbgDBW00BZd-IO_pUAwQMoG73HVMBQokEt86sPUmZLa0_CaqRN4cbl2BG6uj3AUzx8wo8rdKBVYOZYYI0o-KGHBnWUY3OzEVQoxOeztumB_g'
-  let tokenData = await fetch("http://localhost:3000/admin/refreshtoken");
+  const baseUrl = process.env.API_URL || "http://localhost:3000"; // Use environment variable
+  let tokenData = await fetch(`${baseUrl}/admin/refreshtoken`);
   console.log("tokenData");
   console.log(tokenData);
   let token = await tokenData.json();
@@ -72,7 +116,8 @@ const getToken = async () => {
 };
 
 const updateCount = async () => {
-  let countData = await fetch("http://localhost:3000/admin/count");
+  const baseUrl = process.env.API_URL || "http://localhost:3000"; // Use environment variable
+  let countData = await fetch(`${baseUrl}/admin/count`);
   let count = await countData.json();
   if (count.success) {
     console.log(count.data);
@@ -83,15 +128,6 @@ const updateCount = async () => {
   }
 };
 
-getToken();
-
-setInterval(() => {
-  getToken();
-}, 3500000);
-
-setInterval(() => {
-  // updateCount();
-}, 604800000);
 
 app.use(notFound);
 app.use(errorHandler);
